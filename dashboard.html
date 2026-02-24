@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Leave Management System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #ec4899;
+            --accent: #14b8a6;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --background: #f8fafc;
+            --surface: #ffffff;
+            --surface-light: #f1f5f9;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--background);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            padding: 32px 20px;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 48px;
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 800;
+            color: white;
+            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.3);
+        }
+
+        .logo-text h1 {
+            font-family: 'Sora', sans-serif;
+            font-size: 20px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo-text p {
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .nav-menu {
+            list-style: none;
+            flex: 1;
+        }
+
+        .nav-item {
+            margin-bottom: 8px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 18px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 15px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+
+        .nav-link:hover::before,
+        .nav-link.active::before {
+            opacity: 0.1;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: var(--text-primary);
+            transform: translateX(4px);
+        }
+
+        .nav-link.active {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--primary);
+        }
+
+        .nav-icon {
+            font-size: 22px;
+            width: 24px;
+            text-align: center;
+        }
+
+        /* User Profile in Sidebar */
+        .sidebar-footer {
+            margin-top: auto;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+            position: relative;
+        }
+
+        .user-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: var(--surface-light);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .user-card:hover {
+            background: var(--border);
+        }
+
+        .user-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .user-info h3 {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .user-info p {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .user-menu {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 72px;
+            padding: 6px;
+            background: var(--surface-light);
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.4);
+            display: none;
+            z-index: 20;
+        }
+
+        .user-menu button {
+            width: 100%;
+            padding: 8px 10px;
+            border-radius: 8px;
+            border: none;
+            background: linear-gradient(135deg, var(--danger), #f97373);
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .user-menu button span {
+            font-size: 16px;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            padding: 40px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .page-header {
+            margin-bottom: 40px;
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .page-title {
+            font-family: 'Sora', sans-serif;
+            font-size: 36px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, var(--text-primary), var(--text-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .page-subtitle {
+            color: var(--text-secondary);
+            font-size: 16px;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 28px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: fadeInUp 0.6s ease backwards;
+        }
+
+        .stat-card:nth-child(1) { animation-delay: 0.1s; }
+        .stat-card:nth-child(2) { animation-delay: 0.2s; }
+        .stat-card:nth-child(3) { animation-delay: 0.3s; }
+        .stat-card:nth-child(4) { animation-delay: 0.4s; }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, var(--primary) 0%, transparent 70%);
+            opacity: 0.1;
+            border-radius: 50%;
+            transform: translate(30%, -30%);
+            transition: all 0.4s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--primary);
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.2);
+        }
+
+        .stat-card:hover::before {
+            opacity: 0.2;
+            transform: translate(20%, -20%) scale(1.2);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            position: relative;
+            z-index: 1;
+        }
+
+        .stat-icon.blue {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--primary);
+        }
+
+        .stat-icon.green {
+            background: rgba(34, 197, 94, 0.1);
+            color: var(--success);
+        }
+
+        .stat-icon.orange {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+
+        .stat-icon.red {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+
+        .stat-value {
+            font-size: 44px;
+            font-weight: 800;
+            font-family: 'Sora', sans-serif;
+            color: var(--text-primary);
+            line-height: 1;
+            position: relative;
+            z-index: 1;
+        }
+
+        .stat-label {
+            font-size: 15px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            margin-top: 8px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Chart Card */
+        .chart-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 32px;
+            margin-bottom: 40px;
+            animation: fadeInUp 0.6s ease 0.5s backwards;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+        }
+
+        .chart-title {
+            font-family: 'Sora', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .chart-controls {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text-primary);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .btn:hover {
+            background: var(--surface-light);
+            transform: translateY(-1px);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+        }
+
+        /* Employee List Section */
+        .employee-list-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 32px;
+            margin-bottom: 40px;
+            animation: fadeInUp 0.6s ease 0.5s backwards;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .list-title {
+            font-family: 'Sora', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        /* Filter Buttons */
+        .filter-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .filter-btn {
+            padding: 8px 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .filter-btn:hover {
+            background: var(--surface-light);
+        }
+
+        .filter-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* Employee List Container */
+        .employee-list-container {
+            max-height: 600px;
+            overflow-y: auto;
+            padding-right: 8px;
+        }
+
+        /* Custom Scrollbar */
+        .employee-list-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .employee-list-container::-webkit-scrollbar-track {
+            background: var(--surface-light);
+            border-radius: 10px;
+        }
+
+        .employee-list-container::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 10px;
+        }
+
+        .employee-list-container::-webkit-scrollbar-thumb:hover {
+            background: var(--text-secondary);
+        }
+
+        /* Employee Item */
+        .employee-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            background: var(--surface-light);
+            border-radius: 12px;
+            margin-bottom: 12px;
+            transition: all 0.3s ease;
+            border: 1px solid var(--border);
+        }
+
+        .employee-item:hover {
+            background: var(--surface);
+            border-color: var(--primary);
+            transform: translateX(4px);
+        }
+
+        .employee-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .employee-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .employee-details h4 {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .employee-details p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .employee-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-badge.approved {
+            background: rgba(34, 197, 94, 0.1);
+            color: var(--success);
+            border: 1px solid var(--success);
+        }
+
+        .status-badge.pending {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+            border: 1px solid var(--warning);
+        }
+
+        .status-badge.active {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 24px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="logo">
+            <div class="logo-icon">LF</div>
+            <div class="logo-text">
+                <h1>LeaveFlow</h1>
+                <p>Admin Panel</p>
+            </div>
+        </div>
+
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="dashboard.html" class="nav-link active">
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="employees.html" class="nav-link">
+                    <span>Employees</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="leave-requests.html" class="nav-link">
+                    <span>Leave Requests</span>
+                </a>
+            </li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <div class="user-card" onclick="toggleUserMenu(event)">
+                <div class="user-avatar">AD</div>
+                <div class="user-info">
+                    <h3>Admin User</h3>
+                    <p>Administrator</p>
+                </div>
+            </div>
+            <div class="user-menu" id="adminUserMenu">
+                <button type="button" onclick="handleLogout()">
+                    <span>⏏</span>
+                    <span>Logout</span>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="page-header">
+            <h1 class="page-title">Dashboard Overview</h1>
+            <p class="page-subtitle">Monitor your team's attendance and leave status in real-time</p>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon blue"></div>
+                </div>
+                <div class="stat-value" id="totalEmployees">156</div>
+                <div class="stat-label">Total Employees</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon green"></div>
+                </div>
+                <div class="stat-value" id="activeEmployees">142</div>
+                <div class="stat-label">Active Employees</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon orange"></div>
+                </div>
+                <div class="stat-value" id="onLeave">12</div>
+                <div class="stat-label">On Leave</div>
+            </div>
+        </div>
+
+        <!-- Employee List -->
+        <div class="employee-list-card">
+            <div class="list-header">
+                <h2 class="list-title">Employee List</h2>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" onclick="filterEmployees('all')">All</button>
+                    <button class="filter-btn" onclick="filterEmployees('leave')">Leave</button>
+                    <button class="filter-btn" onclick="filterEmployees('present')">Present</button>
+                </div>
+            </div>
+
+            <div class="employee-list-container" id="employeeListContainer">
+                <!-- Employees will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Chart -->
+        <div class="chart-card">
+            <div class="chart-header">
+                <h2 class="chart-title">Employees by Position</h2>
+                <div class="chart-controls">
+                    <button class="btn">Export</button>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="employeeChart"></canvas>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // API Configuration
+        const API_BASE = 'http://localhost:5000/api';
+
+        // Fetch dashboard stats from backend
+        async function loadDashboardStats() {
+            try {
+                const response = await fetch(`${API_BASE}/dashboard/stats`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch dashboard stats');
+                }
+                const stats = await response.json();
+                
+                // Update stats display
+                document.getElementById('totalEmployees').textContent = stats.total;
+                document.getElementById('activeEmployees').textContent = stats.active;
+                document.getElementById('onLeave').textContent = stats.onLeave;
+
+                // Animate numbers on load
+                animateValue('totalEmployees', 0, stats.total, 1000);
+                animateValue('activeEmployees', 0, stats.active, 1000);
+                animateValue('onLeave', 0, stats.onLeave, 1000);
+            } catch (error) {
+                console.error('Error loading dashboard stats:', error);
+                // Fallback to default values if API fails
+                document.getElementById('totalEmployees').textContent = '0';
+                document.getElementById('activeEmployees').textContent = '0';
+                document.getElementById('onLeave').textContent = '0';
+            }
+        }
+
+        // Load stats when page loads
+        loadDashboardStats();
+
+        // Chart initialization
+        let chart = null;
+        const ctx = document.getElementById('employeeChart').getContext('2d');
+
+        // Color palette for chart bars
+        const chartColors = [
+            'rgba(99, 102, 241, 0.8)',   // Primary blue
+            'rgba(236, 72, 153, 0.8)',   // Secondary pink
+            'rgba(20, 184, 166, 0.8)',   // Accent teal
+            'rgba(34, 197, 94, 0.8)',    // Success green
+            'rgba(245, 158, 11, 0.8)',   // Warning orange
+            'rgba(239, 68, 68, 0.8)',    // Danger red
+            'rgba(139, 92, 246, 0.8)',   // Purple
+            'rgba(59, 130, 246, 0.8)',   // Blue
+            'rgba(16, 185, 129, 0.8)',   // Emerald
+            'rgba(251, 191, 36, 0.8)'    // Yellow
+        ];
+
+        // Function to generate colors for any number of positions
+        function generateColors(count) {
+            const colors = [];
+            for (let i = 0; i < count; i++) {
+                colors.push(chartColors[i % chartColors.length]);
+            }
+            return colors;
+        }
+
+        // Load and render chart
+        async function loadChart() {
+            try {
+                const response = await fetch(`${API_BASE}/dashboard/positions`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch position data');
+                }
+                const data = await response.json();
+                
+                const positions = data.positions;
+                const counts = data.counts;
+                const colors = generateColors(positions.length);
+
+                // Destroy existing chart if it exists
+                if (chart) {
+                    chart.destroy();
+                }
+
+                // Create new chart
+                chart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: positions,
+                        datasets: [{
+                            label: 'Number of Employees',
+                            data: counts,
+                            backgroundColor: colors,
+                            borderRadius: 12,
+                            borderSkipped: false,
+                        }]
+                    },
+                    plugins: [{
+                        // Draw numeric value on top of each bar
+                        id: 'valueLabels',
+                        afterDatasetsDraw(chart) {
+                            const { ctx } = chart;
+                            const meta = chart.getDatasetMeta(0);
+                            ctx.save();
+                            ctx.fillStyle = '#0f172a';
+                            ctx.font = '700 12px \"DM Sans\", sans-serif';
+                            ctx.textAlign = 'center';
+                            ctx.textBaseline = 'bottom';
+                            meta.data.forEach((bar, index) => {
+                                const value = chart.data.datasets[0].data[index];
+                                if (value == null) return;
+                                ctx.fillText(String(value), bar.x, bar.y - 6);
+                            });
+                            ctx.restore();
+                        }
+                    }],
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: 'rgba(51, 65, 85, 0.5)',
+                                    drawBorder: false
+                                },
+                                ticks: {
+                                    color: '#94a3b8',
+                                    font: {
+                                        family: 'DM Sans',
+                                        size: 12
+                                    }
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false,
+                                    drawBorder: false
+                                },
+                                ticks: {
+                                    color: '#94a3b8',
+                                    font: {
+                                        family: 'DM Sans',
+                                        size: 12
+                                    },
+                                    maxRotation: 45,
+                                    minRotation: 0
+                                }
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error loading chart data:', error);
+                // Show error message in chart container
+                ctx.canvas.parentElement.innerHTML = 
+                    '<p style="text-align: center; color: var(--text-secondary); padding: 40px;">Failed to load chart data</p>';
+            }
+        }
+
+        // Load chart when page loads
+        loadChart();
+
+        // Number animation
+        function animateValue(id, start, end, duration) {
+            const obj = document.getElementById(id);
+            const range = end - start;
+            const increment = end > start ? 1 : -1;
+            const stepTime = Math.abs(Math.floor(duration / range));
+            let current = start;
+            const timer = setInterval(function() {
+                current += increment;
+                obj.textContent = current;
+                if (current == end) {
+                    clearInterval(timer);
+                }
+            }, stepTime);
+        }
+
+        // Note: Animation is now called from loadDashboardStats() after API response
+
+        function handleLogout() {
+            // Clear stored authentication/session data
+            localStorage.removeItem('leaveflow_token');
+            localStorage.removeItem('leaveflow_role');
+            localStorage.removeItem('leaveflow_employeeId');
+            localStorage.removeItem('leaveflow_adminId');
+            // Redirect to login page
+            window.location.href = 'login (1).html';
+        }
+
+        function toggleUserMenu(event) {
+            event.stopPropagation();
+            const menu = document.getElementById('adminUserMenu');
+            if (!menu) return;
+            const isVisible = menu.style.display === 'block';
+            menu.style.display = isVisible ? 'none' : 'block';
+        }
+
+        window.addEventListener('click', () => {
+            const menu = document.getElementById('adminUserMenu');
+            if (menu) {
+                menu.style.display = 'none';
+            }
+        });
+
+        let currentFilter = 'all';
+        let employees = [];
+
+        // Fetch employee list from backend
+        async function loadEmployeeList(filter = 'all') {
+            try {
+                let endpoint = '';
+                switch(filter) {
+                    case 'all':
+                        endpoint = `${API_BASE}/employees/all`;
+                        break;
+                    case 'leave':
+                        endpoint = `${API_BASE}/employees/leave`;
+                        break;
+                    case 'present':
+                        endpoint = `${API_BASE}/employees/present`;
+                        break;
+                    default:
+                        endpoint = `${API_BASE}/employees/all`;
+                }
+
+                const response = await fetch(endpoint);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch employee list');
+                }
+                employees = await response.json();
+                renderEmployeeList();
+            } catch (error) {
+                console.error('Error loading employee list:', error);
+                document.getElementById('employeeListContainer').innerHTML = 
+                    '<p style="text-align: center; color: var(--text-secondary); padding: 40px;">Failed to load employees</p>';
+            }
+        }
+
+        // Render Employee List
+        function renderEmployeeList() {
+            const container = document.getElementById('employeeListContainer');
+            
+            if (employees.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 40px;">No employees found</p>';
+                return;
+            }
+
+            container.innerHTML = employees.map(emp => {
+                const initials = emp.name.split(' ').map(n => n[0]).join('').toUpperCase();
+                const statusClass = emp.status === 'on_leave' ? 'pending' : 'active';
+                const statusText = emp.status === 'on_leave' ? 'On Leave' : 'Present';
+                // Format employee ID - handle both numeric and string IDs
+                const empId = typeof emp.id === 'number' ? `EMP${String(emp.id).padStart(3, '0')}` : emp.id;
+                
+                return `
+                    <div class="employee-item">
+                        <div class="employee-info">
+                            <div class="employee-avatar">${initials}</div>
+                            <div class="employee-details">
+                                <h4>${emp.name}</h4>
+                                <p>${empId} • ${emp.department}</p>
+                            </div>
+                        </div>
+                        <div class="employee-status">
+                            <span class="status-badge ${statusClass}">${statusText}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Filter Employees
+        function filterEmployees(filter) {
+            currentFilter = filter;
+            
+            // Update active button
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Load employees based on filter
+            loadEmployeeList(filter);
+        }
+
+        // Initialize employee list on page load
+        loadEmployeeList('all');
+    </script>
+</body>
+</html>

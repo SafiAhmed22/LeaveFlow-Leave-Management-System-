@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - Leave Management System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #ec4899;
+            --accent: #14b8a6;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --background: #f8fafc;
+            --surface: #ffffff;
+            --surface-light: #f1f5f9;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--background);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            padding: 32px 20px;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 48px;
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 800;
+            color: white;
+            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.3);
+        }
+
+        .logo-text h1 {
+            font-family: 'Sora', sans-serif;
+            font-size: 20px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo-text p {
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .nav-menu {
+            list-style: none;
+            flex: 1;
+        }
+
+        .nav-item {
+            margin-bottom: 8px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 18px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 15px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+
+        .nav-link:hover::before,
+        .nav-link.active::before {
+            opacity: 0.1;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: var(--text-primary);
+            transform: translateX(4px);
+        }
+
+        .nav-link.active {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--primary);
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+            position: relative;
+        }
+
+        .user-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: var(--surface-light);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .user-card:hover {
+            background: var(--border);
+        }
+
+        .user-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+            color: white;
+        }
+
+        .user-info h3 {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .user-info p {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .user-menu {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 72px;
+            padding: 6px;
+            background: var(--surface-light);
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.4);
+            display: none;
+            z-index: 20;
+        }
+
+        .user-menu button {
+            width: 100%;
+            padding: 8px 10px;
+            border-radius: 8px;
+            border: none;
+            background: linear-gradient(135deg, var(--danger), #f97373);
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .user-menu button span {
+            font-size: 16px;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            padding: 40px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .page-header {
+            margin-bottom: 40px;
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .page-title {
+            font-family: 'Sora', sans-serif;
+            font-size: 36px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, var(--text-primary), var(--text-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .page-subtitle {
+            color: var(--text-secondary);
+            font-size: 16px;
+        }
+
+        /* Profile Card */
+        .profile-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 40px;
+            animation: fadeInUp 0.6s ease 0.1s backwards;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            margin-bottom: 32px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            font-weight: 800;
+            color: white;
+            box-shadow: 0 12px 32px rgba(99, 102, 241, 0.3);
+        }
+
+        .profile-info {
+            flex: 1;
+        }
+
+        .profile-name {
+            font-family: 'Sora', sans-serif;
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .profile-role {
+            font-size: 16px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .profile-stats {
+            display: flex;
+            gap: 24px;
+        }
+
+        .stat-item {
+            padding: 12px 20px;
+            background: var(--surface-light);
+            border-radius: 12px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: 800;
+            font-family: 'Sora', sans-serif;
+            color: var(--text-primary);
+        }
+
+        /* Profile Details Grid */
+        .profile-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+        }
+
+        .detail-group {
+            padding: 20px;
+            background: var(--surface-light);
+            border-radius: 12px;
+        }
+
+        .detail-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .detail-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Leave History Section */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-family: 'Sora', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .history-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 32px;
+            animation: fadeInUp 0.6s ease 0.2s backwards;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .history-table thead {
+            background: var(--surface-light);
+        }
+
+        .history-table th {
+            padding: 14px 16px;
+            text-align: left;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .history-table td {
+            padding: 16px;
+            font-size: 14px;
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .history-table tbody tr {
+            transition: background 0.3s ease;
+        }
+
+        .history-table tbody tr:hover {
+            background: var(--surface-light);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-badge.approved {
+            background: rgba(34, 197, 94, 0.1);
+            color: var(--success);
+            border: 1px solid var(--success);
+        }
+
+        .status-badge.pending {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+            border: 1px solid var(--warning);
+        }
+
+        .status-badge.rejected {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+            border: 1px solid var(--danger);
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 24px;
+            }
+
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .profile-stats {
+                justify-content: center;
+            }
+
+            .history-table {
+                font-size: 13px;
+            }
+
+            .history-table th,
+            .history-table td {
+                padding: 12px 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="logo">
+            <div class="logo-icon">LF</div>
+            <div class="logo-text">
+                <h1>LeaveFlow</h1>
+                <p>Employee Portal</p>
+            </div>
+        </div>
+
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="employee-profile.html" class="nav-link active">
+                    <span>My Profile</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="employee-apply.html" class="nav-link">
+                    <span>Apply Leave</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="employee-status.html" class="nav-link">
+                    <span>Status & Notifications</span>
+                </a>
+            </li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <div class="user-card" onclick="toggleUserMenu(event)">
+                <div class="user-avatar" id="sidebarEmployeeAvatar">JD</div>
+                <div class="user-info">
+                    <h3 id="sidebarEmployeeName">John Doe</h3>
+                    <p>Employee</p>
+                </div>
+            </div>
+            <div class="user-menu" id="employeeUserMenu">
+                <button type="button" onclick="handleLogout()">
+                    <span>⏏</span>
+                    <span>Logout</span>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="page-header">
+            <h1 class="page-title">Employee Profile</h1>
+            <p class="page-subtitle">View employee personal information and leave history</p>
+        </div>
+
+        <!-- Search Section -->
+        <div class="search-section" style="margin-bottom: 32px; background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 24px;">
+            <div style="display: flex; gap: 16px; align-items: end;">
+                <div style="flex: 1;">
+                    <label style="display: block; font-size: 14px; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px;">Employee ID</label>
+                    <input type="text" id="employeeIdInput" class="form-input" placeholder="Enter Employee ID (e.g., 1 or EMP001)" style="width: 100%; padding: 14px 16px; background: var(--surface-light); border: 1px solid var(--border); border-radius: 12px; color: var(--text-primary); font-size: 15px; font-family: 'DM Sans', sans-serif;">
+                </div>
+                <button onclick="loadProfile()" class="btn btn-primary" style="padding: 14px 24px; border-radius: 12px; border: none; font-size: 15px; font-weight: 600; cursor: pointer; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; box-shadow: 0 8px 24px rgba(99, 102, 241, 0.3);">Load Profile</button>
+            </div>
+            <div id="errorMessage" style="margin-top: 16px; padding: 12px 16px; border-radius: 8px; display: none; background: rgba(239, 68, 68, 0.15); border: 1px solid var(--danger); color: var(--danger); font-weight: 600;"></div>
+        </div>
+
+        <!-- Profile Card -->
+        <div class="profile-card" id="profileCard" style="display: none;">
+            <div class="profile-header">
+                <div class="profile-avatar" id="profileAvatar">JD</div>
+                <div class="profile-info">
+                    <h2 class="profile-name" id="profileName">John Doe</h2>
+                    <p class="profile-role" id="profileRole">Position • Department</p>
+                    <div class="profile-stats">
+                        <div class="stat-item">
+                            <div class="stat-label">Employee ID</div>
+                            <div class="stat-value" id="profileEmployeeId">EMP001</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Username</div>
+                            <div class="stat-value" id="profileUsername">-</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Remaining Balance</div>
+                            <div class="stat-value" id="profileRemaining">0</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Status</div>
+                            <div class="stat-value" id="profileStatus">-</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="profile-details">
+                <div class="detail-group">
+                    <div class="detail-label">Name</div>
+                    <div class="detail-value" id="detailName">-</div>
+                </div>
+                <div class="detail-group">
+                    <div class="detail-label">Gender</div>
+                    <div class="detail-value" id="detailGender">-</div>
+                </div>
+                <div class="detail-group">
+                    <div class="detail-label">Age</div>
+                    <div class="detail-value" id="detailAge">-</div>
+                </div>
+                <div class="detail-group">
+                    <div class="detail-label">Email Address</div>
+                    <div class="detail-value" id="detailEmail">-</div>
+                </div>
+                <div class="detail-group">
+                    <div class="detail-label">Phone Number</div>
+                    <div class="detail-value" id="detailPhone">-</div>
+                </div>
+                <div class="detail-group">
+                    <div class="detail-label">Department</div>
+                    <div class="detail-value" id="detailDepartment">-</div>
+                </div>
+                <div class="detail-group">
+                    <div class="detail-label">Position</div>
+                    <div class="detail-value" id="detailPosition">-</div>
+                </div>
+                <div class="detail-group">
+                    <div class="detail-label">Status</div>
+                    <div class="detail-value" id="detailStatus">-</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Leave History -->
+        <div class="history-card">
+            <div class="section-header">
+                <h2 class="section-title">Leave History</h2>
+            </div>
+
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th>Request Date</th>
+                        <th>Leave Period</th>
+                        <th>Days</th>
+                        <th>Reason</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="historyTableBody">
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 40px; color: var(--text-secondary);">Enter Employee ID and click "Load Profile" to view leave history</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <script>
+        // API Configuration
+        const API_BASE = 'http://localhost:5000/api';
+        const AUTH_TOKEN = localStorage.getItem('leaveflow_token');
+
+        function authHeaders() {
+            return AUTH_TOKEN ? { 'Authorization': `Bearer ${AUTH_TOKEN}` } : {};
+        }
+
+        // Helper function to extract numeric ID from "EMP001" format or use numeric ID
+        function extractEmployeeId(idString) {
+            const trimmed = idString.trim();
+            // If it's in "EMP001" format, extract the number
+            if (trimmed.toUpperCase().startsWith('EMP')) {
+                return parseInt(trimmed.substring(3));
+            }
+            // Otherwise, try to parse as number
+            return parseInt(trimmed);
+        }
+
+        // Load employee profile
+        async function loadProfile() {
+            const idInput = document.getElementById('employeeIdInput').value.trim();
+            const errorMessage = document.getElementById('errorMessage');
+            const profileCard = document.getElementById('profileCard');
+
+            if (!idInput) {
+                errorMessage.textContent = 'Please enter an employee ID';
+                errorMessage.style.display = 'block';
+                return;
+            }
+
+            try {
+                const employeeId = extractEmployeeId(idInput);
+                if (isNaN(employeeId)) {
+                    throw new Error('Invalid employee ID format');
+                }
+
+                const response = await fetch(`${API_BASE}/employees/${employeeId}/profile`, {
+                    headers: authHeaders()
+                });
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.message || 'Employee not found');
+                }
+
+                const profile = await response.json();
+
+                // Hide error message
+                errorMessage.style.display = 'none';
+
+                // Update profile section
+                const initials = profile.name.split(' ').map(n => n[0]).join('').toUpperCase();
+                const empId = typeof profile.employeeId === 'number' ? `EMP${String(profile.employeeId).padStart(3, '0')}` : profile.employeeId;
+
+                document.getElementById('profileAvatar').textContent = initials;
+                document.getElementById('profileName').textContent = profile.name;
+                document.getElementById('profileRole').textContent = `${profile.position} • ${profile.department}`;
+                document.getElementById('profileEmployeeId').textContent = empId;
+                document.getElementById('profileUsername').textContent = profile.username || '-';
+                document.getElementById('profileRemaining').textContent = `${profile.remainingLeaveBalance} days`;
+                document.getElementById('profileStatus').textContent = profile.status;
+
+                // Update profile details
+                document.getElementById('detailName').textContent = profile.name;
+                document.getElementById('detailGender').textContent = profile.gender || '-';
+                document.getElementById('detailAge').textContent = profile.age || '-';
+                document.getElementById('detailEmail').textContent = profile.email || '-';
+                document.getElementById('detailPhone').textContent = profile.phone || '-';
+                document.getElementById('detailDepartment').textContent = profile.department || '-';
+                document.getElementById('detailPosition').textContent = profile.position || '-';
+                document.getElementById('detailStatus').textContent = profile.status || '-';
+
+                // Show profile card
+                profileCard.style.display = 'block';
+
+                // Update leave history
+                updateLeaveHistory(profile.leaveHistory);
+
+            } catch (error) {
+                console.error('Error loading profile:', error);
+                errorMessage.textContent = error.message || 'Failed to load employee profile';
+                errorMessage.style.display = 'block';
+                profileCard.style.display = 'none';
+            }
+        }
+
+        // Update leave history table
+        function updateLeaveHistory(leaveHistory) {
+            const tbody = document.getElementById('historyTableBody');
+
+            if (!leaveHistory || leaveHistory.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 40px; color: var(--text-secondary);">No leave history found</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = leaveHistory.map(leave => {
+                // Convert status to lowercase for CSS class, but keep original for display
+                const statusClass = (leave.status || '').toLowerCase();
+                const statusText = leave.status || 'Unknown';
+                const appliedDate = formatDate(leave.appliedOn);
+                const period = `${formatDate(leave.startDate)} - ${formatDate(leave.endDate)}`;
+
+                return `
+                    <tr>
+                        <td>${appliedDate}</td>
+                        <td>${period}</td>
+                        <td>${leave.leaveDays} days</td>
+                        <td>${leave.reason || 'No reason provided'}</td>
+                        <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Format date helper
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        }
+
+        // Allow Enter key to trigger search
+        document.getElementById('employeeIdInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                loadProfile();
+            }
+        });
+
+        // Auto-load for logged-in employee and update sidebar name
+        window.addEventListener('load', () => {
+            const storedEmployeeId = localStorage.getItem('leaveflow_employeeId');
+            const storedName = localStorage.getItem('leaveflow_employeeName');
+            const role = localStorage.getItem('leaveflow_role');
+
+            // Update sidebar display name and initials if available
+            if (storedName) {
+                const nameEl = document.getElementById('sidebarEmployeeName');
+                const avatarEl = document.getElementById('sidebarEmployeeAvatar');
+                if (nameEl) nameEl.textContent = storedName;
+                if (avatarEl) {
+                    const initials = storedName
+                        .split(' ')
+                        .filter(Boolean)
+                        .map(part => part[0])
+                        .join('')
+                        .toUpperCase()
+                        .slice(0, 2);
+                    avatarEl.textContent = initials || 'EMP';
+                }
+            }
+
+            if (role === 'employee' && storedEmployeeId) {
+                const input = document.getElementById('employeeIdInput');
+                input.value = storedEmployeeId;
+                // Optional: hide the ID search for employee self-view
+                const searchSection = document.querySelector('.search-section');
+                if (searchSection) searchSection.style.display = 'none';
+                loadProfile();
+            }
+        });
+
+        function handleLogout() {
+            // Clear stored authentication/session data
+            localStorage.removeItem('leaveflow_token');
+            localStorage.removeItem('leaveflow_role');
+            localStorage.removeItem('leaveflow_employeeId');
+            localStorage.removeItem('leaveflow_adminId');
+            // Redirect to login page
+            window.location.href = 'login (1).html';
+        }
+
+        function toggleUserMenu(event) {
+            event.stopPropagation();
+            const menu = document.getElementById('employeeUserMenu');
+            if (!menu) return;
+            const isVisible = menu.style.display === 'block';
+            menu.style.display = isVisible ? 'none' : 'block';
+        }
+
+        window.addEventListener('click', () => {
+            const menu = document.getElementById('employeeUserMenu');
+            if (menu) {
+                menu.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

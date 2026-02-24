@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employees - Leave Management System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #ec4899;
+            --accent: #14b8a6;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --background: #f8fafc;
+            --surface: #ffffff;
+            --surface-light: #f1f5f9;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--background);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            padding: 32px 20px;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 48px;
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 800;
+            color: white;
+            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.3);
+        }
+
+        .logo-text h1 {
+            font-family: 'Sora', sans-serif;
+            font-size: 20px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo-text p {
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .nav-menu {
+            list-style: none;
+            flex: 1;
+        }
+
+        .nav-item {
+            margin-bottom: 8px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 18px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 15px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+
+        .nav-link:hover::before,
+        .nav-link.active::before {
+            opacity: 0.1;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: var(--text-primary);
+            transform: translateX(4px);
+        }
+
+        .nav-link.active {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--primary);
+        }
+
+        .nav-icon {
+            font-size: 22px;
+            width: 24px;
+            text-align: center;
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+            position: relative;
+        }
+
+        .user-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: var(--surface-light);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .user-card:hover {
+            background: var(--border);
+        }
+
+        .user-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .user-info h3 {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .user-info p {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .user-menu {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 72px;
+            padding: 6px;
+            background: var(--surface-light);
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.4);
+            display: none;
+            z-index: 20;
+        }
+
+        .user-menu button {
+            width: 100%;
+            padding: 8px 10px;
+            border-radius: 8px;
+            border: none;
+            background: linear-gradient(135deg, var(--danger), #f97373);
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .user-menu button span {
+            font-size: 16px;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            padding: 40px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .page-header {
+            margin-bottom: 40px;
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .page-title {
+            font-family: 'Sora', sans-serif;
+            font-size: 36px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, var(--text-primary), var(--text-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .page-subtitle {
+            color: var(--text-secondary);
+            font-size: 16px;
+        }
+
+        /* Action Cards Grid */
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 18px;
+            margin-bottom: 40px;
+        }
+
+        .action-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 22px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: fadeInUp 0.6s ease backwards;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-card:nth-child(1) { animation-delay: 0.1s; }
+        .action-card:nth-child(2) { animation-delay: 0.2s; }
+        .action-card:nth-child(3) { animation-delay: 0.3s; }
+        .action-card:nth-child(4) { animation-delay: 0.4s; }
+
+        .action-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, var(--primary) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .action-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--primary);
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.2);
+        }
+
+        .action-card:hover::before {
+            opacity: 0.1;
+        }
+
+        .action-icon {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.3);
+        }
+
+        .action-title {
+            font-family: 'Sora', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+
+        .action-description {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 14px;
+            line-height: 1.6;
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px 12px;
+            background: var(--surface-light);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 15px;
+            font-family: 'DM Sans', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        select.form-input {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            padding-right: 40px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'DM Sans', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--surface-light);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #16a34a;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        /* Result Card */
+        .result-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 32px;
+            margin-top: 24px;
+            animation: fadeInUp 0.6s ease;
+            display: none;
+        }
+
+        .result-card.show {
+            display: block;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .result-title {
+            font-family: 'Sora', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .employee-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .detail-item {
+            padding: 16px;
+            background: var(--surface-light);
+            border-radius: 12px;
+        }
+
+        .detail-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .detail-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Success/Error Messages */
+        .message {
+            padding: 16px 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+            font-weight: 600;
+            animation: fadeInUp 0.4s ease;
+            display: none;
+        }
+
+        .message.show {
+            display: block;
+        }
+
+        .message.success {
+            background: rgba(34, 197, 94, 0.15);
+            border: 1px solid var(--success);
+            color: var(--success);
+        }
+
+        .message.error {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid var(--danger);
+            color: var(--danger);
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 24px;
+            }
+
+            .actions-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="logo">
+            <div class="logo-icon">LF</div>
+            <div class="logo-text">
+                <h1>LeaveFlow</h1>
+                <p>Admin Panel</p>
+            </div>
+        </div>
+
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="dashboard.html" class="nav-link">
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="employees.html" class="nav-link active">
+                    <span>Employees</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="leave-requests.html" class="nav-link">
+                    <span>Leave Requests</span>
+                </a>
+            </li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <div class="user-card" onclick="toggleUserMenu(event)">
+                <div class="user-avatar">AD</div>
+                <div class="user-info">
+                    <h3>Admin User</h3>
+                    <p>Administrator</p>
+                </div>
+            </div>
+            <div class="user-menu" id="adminUserMenu">
+                <button type="button" onclick="handleLogout()">
+                    <span>⏏</span>
+                    <span>Logout</span>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="page-header">
+            <h1 class="page-title">Employee Management</h1>
+            <p class="page-subtitle">Search, add, edit, or remove employee records</p>
+        </div>
+
+        <!-- Actions Grid -->
+        <div class="actions-grid">
+            <!-- Search Employee -->
+            <div class="action-card">
+                <div class="action-icon">SR</div>
+                <h3 class="action-title">Search Employee</h3>
+                <p class="action-description">Find employee details by entering their unique ID</p>
+                
+                <div class="form-group">
+                    <label class="form-label">Employee ID</label>
+                    <input type="text" class="form-input" id="searchId" placeholder="Enter employee ID (e.g., EMP001)">
+                </div>
+                <button class="btn btn-primary" onclick="searchEmployee()">Search</button>
+
+                <div class="result-card" id="searchResult">
+                    <div class="result-header">
+                        <h3 class="result-title">Employee Details</h3>
+                    </div>
+                    <div class="employee-details" id="employeeDetails"></div>
+                </div>
+            </div>
+
+            <!-- Add Employee -->
+            <div class="action-card">
+                <div class="action-icon">AD</div>
+                <h3 class="action-title">Add Employee</h3>
+                <p class="action-description">Register a new employee in the system</p>
+                
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" class="form-input" id="addName" placeholder="Full Name" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Gender</label>
+                    <select class="form-input" id="addGender" required>
+                        <option value="">Select Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Age</label>
+                    <input type="number" class="form-input" id="addAge" placeholder="Age" min="18" max="100" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Position</label>
+                    <input type="text" class="form-input" id="addPosition" placeholder="Position" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Department</label>
+                    <input type="text" class="form-input" id="addDepartment" placeholder="Department" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Phone</label>
+                    <input type="tel" class="form-input" id="addPhone" placeholder="+923001234567" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-input" id="addEmail" placeholder="email@company.com" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Status</label>
+                    <select class="form-input" id="addStatus" required>
+                        <option value="">Select Status</option>
+                        <option value="Active">Active</option>
+                        <option value="On Leave">On Leave</option>
+                    </select>
+                </div>
+                <button class="btn btn-success" onclick="addEmployee()">Add Employee</button>
+
+                <div class="message" id="addMessage"></div>
+            </div>
+
+            <!-- Edit Employee -->
+            <div class="action-card">
+                <div class="action-icon">ED</div>
+                <h3 class="action-title">Edit Employee</h3>
+                <p class="action-description">Update employee information by ID</p>
+                
+                <div class="form-group">
+                    <label class="form-label">Employee ID</label>
+                    <input type="text" class="form-input" id="editId" placeholder="Enter employee ID" onchange="loadEmployeeForEdit()">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Name</label>
+                    <input type="text" class="form-input" id="editName" placeholder="Name">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Gender</label>
+                    <select class="form-input" id="editGender">
+                        <option value="">Select Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Age</label>
+                    <input type="number" class="form-input" id="editAge" placeholder="Age" min="18" max="100">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Position</label>
+                    <input type="text" class="form-input" id="editPosition" placeholder="Position">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Department</label>
+                    <input type="text" class="form-input" id="editDepartment" placeholder="Department">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Phone</label>
+                    <input type="tel" class="form-input" id="editPhone" placeholder="+923001234567">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-input" id="editEmail" placeholder="email@company.com">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Status</label>
+                    <select class="form-input" id="editStatus">
+                        <option value="">Select Status</option>
+                        <option value="Active">Active</option>
+                        <option value="On Leave">On Leave</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary" onclick="editEmployee()">Update</button>
+
+                <div class="message" id="editMessage"></div>
+            </div>
+
+            <!-- Delete Employee -->
+            <div class="action-card">
+                <div class="action-icon">DL</div>
+                <h3 class="action-title">Delete Employee</h3>
+                <p class="action-description">Remove an employee from the system</p>
+                
+                <div class="form-group">
+                    <label class="form-label">Employee ID</label>
+                    <input type="text" class="form-input" id="deleteId" placeholder="Enter employee ID">
+                </div>
+                <button class="btn btn-danger" onclick="deleteEmployee()">Delete</button>
+
+                <div class="message" id="deleteMessage"></div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // API Configuration
+        const API_BASE = 'http://localhost:5000/api';
+
+        // Helper function to extract numeric ID from "EMP001" format or use numeric ID
+        function extractEmployeeId(idString) {
+            const trimmed = idString.trim();
+            // If it's in "EMP001" format, extract the number
+            if (trimmed.toUpperCase().startsWith('EMP')) {
+                return parseInt(trimmed.substring(3));
+            }
+            // Otherwise, try to parse as number
+            return parseInt(trimmed);
+        }
+
+        // Search Employee
+        async function searchEmployee() {
+            const idInput = document.getElementById('searchId').value.trim();
+            const resultCard = document.getElementById('searchResult');
+            const detailsDiv = document.getElementById('employeeDetails');
+
+            if (!idInput) {
+                showMessage(document.createElement('div'), 'error', 'Please enter an employee ID');
+                return;
+            }
+
+            try {
+                const employeeId = extractEmployeeId(idInput);
+                if (isNaN(employeeId)) {
+                    throw new Error('Invalid employee ID format');
+                }
+
+                const response = await fetch(`${API_BASE}/employees/${employeeId}`);
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.message || 'Employee not found');
+                }
+
+                const employee = await response.json();
+
+                // Display employee details
+                let detailsHTML = `
+                    <div class="detail-item">
+                        <div class="detail-label">Employee ID</div>
+                        <div class="detail-value">${employee.id}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Name</div>
+                        <div class="detail-value">${employee.name}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Gender</div>
+                        <div class="detail-value">${employee.gender}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Age</div>
+                        <div class="detail-value">${employee.age}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Position</div>
+                        <div class="detail-value">${employee.position}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Department</div>
+                        <div class="detail-value">${employee.department}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Phone</div>
+                        <div class="detail-value">${employee.phone}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Email</div>
+                        <div class="detail-value">${employee.email}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Status</div>
+                        <div class="detail-value">${employee.status}</div>
+                    </div>
+                `;
+
+                // Add leave history if available
+                if (employee.leaveHistory && employee.leaveHistory.length > 0) {
+                    detailsHTML += `
+                        <div style="grid-column: 1 / -1; margin-top: 20px;">
+                            <div class="detail-label" style="margin-bottom: 12px;">Leave History</div>
+                            <div style="max-height: 300px; overflow-y: auto;">
+                    `;
+                    employee.leaveHistory.forEach(leave => {
+                        detailsHTML += `
+                            <div style="padding: 12px; background: var(--surface-light); border-radius: 8px; margin-bottom: 8px;">
+                                <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 4px;">
+                                    ${leave.startDate} to ${leave.endDate} • ${leave.leaveDays} days • Status: ${leave.status}
+                                </div>
+                                <div style="font-size: 12px; color: var(--text-primary);">
+                                    Reason: ${leave.reason || 'N/A'} • Remaining: ${leave.remainingDays} days
+                                </div>
+                            </div>
+                        `;
+                    });
+                    detailsHTML += `</div></div>`;
+                }
+
+                detailsDiv.innerHTML = detailsHTML;
+                resultCard.classList.add('show');
+            } catch (error) {
+                console.error('Error searching employee:', error);
+                showMessage(document.createElement('div'), 'error', error.message || 'Failed to search employee');
+                resultCard.classList.remove('show');
+            }
+        }
+
+        // Add Employee
+        async function addEmployee() {
+            const name = document.getElementById('addName').value.trim();
+            const gender = document.getElementById('addGender').value.trim();
+            const age = document.getElementById('addAge').value.trim();
+            const position = document.getElementById('addPosition').value.trim();
+            const department = document.getElementById('addDepartment').value.trim();
+            const phone = document.getElementById('addPhone').value.trim();
+            const email = document.getElementById('addEmail').value.trim();
+            const status = document.getElementById('addStatus').value.trim();
+            const message = document.getElementById('addMessage');
+
+            // Validate all required fields
+            if (!name || !gender || !age || !position || !department || !phone || !email || !status) {
+                showMessage(message, 'error', 'Please fill in all required fields');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/employees`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name,
+                        gender,
+                        age: parseInt(age),
+                        position,
+                        department,
+                        phone,
+                        email,
+                        status
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message || 'Failed to add employee');
+                }
+
+                showMessage(message, 'success', 
+                    `Employee added successfully! ID: ${data.employee.id}, Username: ${data.employee.username}, Password: ${data.employee.password}`);
+
+                // Clear form
+                document.getElementById('addName').value = '';
+                document.getElementById('addGender').value = '';
+                document.getElementById('addAge').value = '';
+                document.getElementById('addPosition').value = '';
+                document.getElementById('addDepartment').value = '';
+                document.getElementById('addPhone').value = '';
+                document.getElementById('addEmail').value = '';
+                document.getElementById('addStatus').value = '';
+            } catch (error) {
+                console.error('Error adding employee:', error);
+                showMessage(message, 'error', error.message || 'Failed to add employee');
+            }
+        }
+
+        // Load employee data for editing
+        async function loadEmployeeForEdit() {
+            const idInput = document.getElementById('editId').value.trim();
+            
+            if (!idInput) {
+                return;
+            }
+
+            try {
+                const employeeId = extractEmployeeId(idInput);
+                if (isNaN(employeeId)) {
+                    return;
+                }
+
+                const response = await fetch(`${API_BASE}/employees/${employeeId}`);
+                
+                if (!response.ok) {
+                    return; // Employee not found, don't fill form
+                }
+
+                const employee = await response.json();
+
+                // Fill form with current values
+                document.getElementById('editName').value = employee.name || '';
+                document.getElementById('editGender').value = employee.gender || '';
+                document.getElementById('editAge').value = employee.age || '';
+                document.getElementById('editPosition').value = employee.position || '';
+                document.getElementById('editDepartment').value = employee.department || '';
+                document.getElementById('editPhone').value = employee.phone || '';
+                document.getElementById('editEmail').value = employee.email || '';
+                document.getElementById('editStatus').value = employee.status || '';
+            } catch (error) {
+                console.error('Error loading employee:', error);
+            }
+        }
+
+        // Edit Employee
+        async function editEmployee() {
+            const idInput = document.getElementById('editId').value.trim();
+            const name = document.getElementById('editName').value.trim();
+            const gender = document.getElementById('editGender').value.trim();
+            const age = document.getElementById('editAge').value.trim();
+            const position = document.getElementById('editPosition').value.trim();
+            const department = document.getElementById('editDepartment').value.trim();
+            const phone = document.getElementById('editPhone').value.trim();
+            const email = document.getElementById('editEmail').value.trim();
+            const status = document.getElementById('editStatus').value.trim();
+            const message = document.getElementById('editMessage');
+
+            if (!idInput) {
+                showMessage(message, 'error', 'Please enter an employee ID');
+                return;
+            }
+
+            try {
+                const employeeId = extractEmployeeId(idInput);
+                if (isNaN(employeeId)) {
+                    throw new Error('Invalid employee ID format');
+                }
+
+                // Build update object with only filled fields
+                const updateData = {};
+                if (name) updateData.name = name;
+                if (gender) updateData.gender = gender;
+                if (age) updateData.age = parseInt(age);
+                if (position) updateData.position = position;
+                if (department) updateData.department = department;
+                if (phone) updateData.phone = phone;
+                if (email) updateData.email = email;
+                if (status) updateData.status = status;
+
+                const response = await fetch(`${API_BASE}/employees/${employeeId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(updateData)
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message || 'Failed to update employee');
+                }
+
+                showMessage(message, 'success', 'Employee updated successfully!');
+
+                // Clear form
+                document.getElementById('editId').value = '';
+                document.getElementById('editName').value = '';
+                document.getElementById('editGender').value = '';
+                document.getElementById('editAge').value = '';
+                document.getElementById('editPosition').value = '';
+                document.getElementById('editDepartment').value = '';
+                document.getElementById('editPhone').value = '';
+                document.getElementById('editEmail').value = '';
+                document.getElementById('editStatus').value = '';
+            } catch (error) {
+                console.error('Error updating employee:', error);
+                showMessage(message, 'error', error.message || 'Failed to update employee');
+            }
+        }
+
+        // Delete Employee
+        async function deleteEmployee() {
+            const idInput = document.getElementById('deleteId').value.trim();
+            const message = document.getElementById('deleteMessage');
+
+            if (!idInput) {
+                showMessage(message, 'error', 'Please enter an employee ID');
+                return;
+            }
+
+            try {
+                const employeeId = extractEmployeeId(idInput);
+                if (isNaN(employeeId)) {
+                    throw new Error('Invalid employee ID format');
+                }
+
+                const response = await fetch(`${API_BASE}/employees/${employeeId}`, {
+                    method: 'DELETE'
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message || 'Failed to delete employee');
+                }
+
+                showMessage(message, 'success', data.message || 'Employee deleted successfully!');
+                document.getElementById('deleteId').value = '';
+            } catch (error) {
+                console.error('Error deleting employee:', error);
+                showMessage(message, 'error', error.message || 'Failed to delete employee');
+            }
+        }
+
+        function showMessage(element, type, text) {
+            if (element && element.id) {
+                element.className = `message ${type} show`;
+                element.textContent = text;
+                setTimeout(() => {
+                    element.classList.remove('show');
+                }, 5000);
+            } else {
+                console[type === 'error' ? 'error' : 'log'](text);
+            }
+        }
+
+        function handleLogout() {
+            // Clear stored authentication/session data
+            localStorage.removeItem('leaveflow_token');
+            localStorage.removeItem('leaveflow_role');
+            localStorage.removeItem('leaveflow_employeeId');
+            localStorage.removeItem('leaveflow_adminId');
+            // Redirect to login page
+            window.location.href = 'login (1).html';
+        }
+
+        function toggleUserMenu(event) {
+            event.stopPropagation();
+            const menu = document.getElementById('adminUserMenu');
+            if (!menu) return;
+            const isVisible = menu.style.display === 'block';
+            menu.style.display = isVisible ? 'none' : 'block';
+        }
+
+        window.addEventListener('click', () => {
+            const menu = document.getElementById('adminUserMenu');
+            if (menu) {
+                menu.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
