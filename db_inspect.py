@@ -1,6 +1,7 @@
 import sqlite3
 from pathlib import Path
 
+#This is the path to your db
 DB_PATH = Path(__file__).with_name("leave_management_system.db")
 
 
